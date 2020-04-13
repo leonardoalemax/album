@@ -1,32 +1,22 @@
-import cheerio from 'cheerio';
-import fetch from 'node-fetch';
-import { Games } from './scrap/playstation'
+import { Games } from './scrap/playstation';
+import low from 'lowdb';
+import FileSync from 'lowdb/adapters/FileSync';
+
+
+const adapter = new FileSync('playsation.db.json')
+const db = low(adapter)
+
+db.defaults({ games: [] }).write()
 
 const init = async () => {
-  // const data = await fetch('https://psnprofiles.com/leonardoalemax');
-  // const $ = cheerio.load(await data.text());
+  const games = await Games('https://psnprofiles.com/leonardoalemax');
 
+  games.map(game => {
+    db.get('games')
+      .push({ ...game })
+      .write()
+  });
 
-  // const games = $('#gamesTable tr');
-
-  // const dataSet = games.get().map(game => {
-  //   const title = $(game).find('.title').text();
-  //   const picture = $(game).find('img').prop('src');
-  //   const platform = $(game).find('.platform').text();
-  //   const percentege = $(game).find('.progress-bar span').text();
-
-  //   return {
-  //     title, platform, picture, percentege
-  //   }
-  // });
-
-
-  // https://psnprofiles.com/leonardoalemax
-  // console.log(dataSet);
-  Games('https://psnprofiles.com/leonardoalemax')
-    .then((data) => {
-      console.log(data);
-    })
 }
 
 init();
